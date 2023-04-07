@@ -5,7 +5,7 @@ import routes from './routes/index';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 
 app.use('/api', routes);
 
