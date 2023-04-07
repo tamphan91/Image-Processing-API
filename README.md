@@ -12,6 +12,9 @@ Image Processing API
 - npm run dev
 - npm run start
 
-## ENDPOINT
+## ENDPOINTS
 - http://localhost:8000/api/images?fileName=fjord
+- http://localhost:8000/api/images?fileName=fjord1
+- http://localhost:8000/api/images?fileName=fjord&width=a&height=200
 - http://localhost:8000/api/images?fileName=fjord&width=300&height=200
+- http://localhost:8000/api/images?fileName=fjord&width=300&height=-200

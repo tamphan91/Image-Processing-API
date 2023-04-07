@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
-import { checkFileExists, transformImage, createFile } from '../../utilities/index';
+import { checkFileExists, transformImage, createFile, isPositiveNumber } from '../../utilities/index';
 const images = express.Router();
 
 images.get('/', async (req: Request, res: Response) => {
@@ -17,16 +17,31 @@ images.get('/', async (req: Request, res: Response) => {
     res.status(400).send('width and height are required');
     return;
   }
-
   const fullFileDir = path.join(process.cwd(), '/public/assets/images/full');
   const thumbFileDir = path.join(process.cwd(), '/public/assets/images/thumb');
+  const fullFilePath = `${fullFileDir}/${fileName}.jpg`;
+  const isExist = await checkFileExists(fullFilePath);
+  if (!isExist) {
+    res.status(404).send('File not found');
+    return;
+  }
 
   if (width != null && height != null) {
-    const filePath = `${thumbFileDir}/${fileName}_${width}_${height}.jpg`;
-    const isExist = await checkFileExists(filePath);
+    try {
+      if (!isPositiveNumber(width) || !isPositiveNumber(height)) {
+        res.status(400).send('width and height must be positive');
+        return;
+      }
+    } catch (error) {
+      res.status(400).send('width and height must be number');
+      return;
+    }
+
+    const thumbFilePath = `${thumbFileDir}/${fileName}_${width}_${height}.jpg`;
+    const isExist = await checkFileExists(thumbFilePath);
     if (isExist) {
-      console.log('get image from thumb dir');
-      res.sendFile(filePath);
+      // console.log('get image from thumb dir');
+      res.sendFile(thumbFilePath);
       return;
     }
 
@@ -37,17 +52,17 @@ images.get('/', async (req: Request, res: Response) => {
         parseInt(width as string),
         parseInt(height as string)
       );
-      console.log('save image to thumb dir');
-      await createFile(transformedImage, filePath);
-      res.sendFile(filePath);
+      // console.log('save image to thumb dir');
+      await createFile(transformedImage, thumbFilePath);
+      res.sendFile(thumbFilePath);
     } catch (err) {
       console.log(err);
     }
     return;
   }
 
-  console.log('get image from full dir');
-  res.sendFile(`${fullFileDir}/${fileName}.jpg`);
+  // console.log('get image from full dir');
+  res.sendFile(fullFilePath);
   return;
 });
 

@@ -31,13 +31,33 @@ describe('Transform image', () => {
 
 const request = supertest(app);
 describe('Test endpoint responses', () => {
-  it('gets the api endpoint with fileName query', async () => {
+  it('gets the api endpoint without fileName query', async () => {
+    const response = await request.get('/api/images');
+    expect(response.status).toBe(400);
+  });
+
+  it('gets the api endpoint with fileName query does exist', async () => {
     const response = await request.get('/api/images?fileName=fjord');
     expect(response.status).toBe(200);
   });
 
-  it('gets the api endpoint without fileName query', async () => {
-    const response = await request.get('/api/images');
+  it('gets the api endpoint with fileName query does not exist', async () => {
+    const response = await request.get('/api/images?fileName=fjord1');
+    expect(response.status).toBe(404);
+  });
+
+  it('gets the api endpoint with height is not positive', async () => {
+    const response = await request.get('/api/images?fileName=fjord&width=300&height=-100');
     expect(response.status).toBe(400);
+  });
+
+  it('gets the api endpoint with height is not number', async () => {
+    const response = await request.get('/api/images?fileName=fjord&width=a&height=-100');
+    expect(response.status).toBe(400);
+  });
+
+  it('gets the api endpoint with height and width are positive', async () => {
+    const response = await request.get('/api/images?fileName=fjord&width=300&height=200');
+    expect(response.status).toBe(200);
   });
 });

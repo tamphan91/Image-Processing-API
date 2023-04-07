@@ -18,3 +18,11 @@ export const transformImage = async (filePath: string, width: number, height: nu
 export const createFile = async (file: Buffer, filePath: string) => {
   await fs.writeFile(filePath, file);
 };
+
+export const isPositiveNumber = (input: unknown): boolean => {
+  const value = parseInt(input as string);
+  if (isNaN(value)) {
+    throw new Error();
+  }
+  return value > 0;
+};
